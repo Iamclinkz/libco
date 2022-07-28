@@ -45,20 +45,27 @@ struct stShareStack_t
 };
 
 
-
+//携程控制块结构
 struct stCoRoutine_t
 {
+	//指定了携程的环境，由于不支持携程在线程之间的迁移，所以属于是同一个线程的所有携程的执行环境，
+	//即指向的是本co对应的thread的环境
 	stCoRoutineEnv_t *env;
+	//待执行携程数量
 	pfn_co_routine_t pfn;
+	//待执行携程参数
 	void *arg;
+	//用于携程切换保留上下文
 	coctx_t ctx;
 
+	//本携程的各种标志
 	char cStart;
 	char cEnd;
 	char cIsMain;
 	char cEnableSysHook;
 	char cIsShareStack;
 
+	//保存程序的环境变量的指针
 	void *pvEnv;
 
 	//char sRunStack[ 1024 * 128 ];
