@@ -22,15 +22,20 @@
 #include <queue>
 #include "co_routine.h"
 using namespace std;
+
+//模拟的task本身
 struct stTask_t
 {
 	int id;
 };
+
+//模拟的任务的执行环境
 struct stEnv_t
 {
-	stCoCond_t* cond;
-	queue<stTask_t*> task_queue;
+	stCoCond_t* cond;					//可以执行的task的前提
+	queue<stTask_t*> task_queue;		//实际存放task的队列
 };
+
 void* Producer(void* args)
 {
 	co_enable_hook_sys();
@@ -53,6 +58,7 @@ void* Consumer(void* args)
 	stEnv_t* env = (stEnv_t*)args;
 	while (true)
 	{
+		//检查是否是empty,如果是的话,cond wait一手
 		if (env->task_queue.empty())
 		{
 			co_cond_timedwait(env->cond, -1);
@@ -67,13 +73,16 @@ void* Consumer(void* args)
 }
 int main()
 {
+	//初始化生产者,消费者的共享的队列
 	stEnv_t* env = new stEnv_t;
 	env->cond = co_cond_alloc();
 
+	//创建消费者co
 	stCoRoutine_t* consumer_routine;
 	co_create(&consumer_routine, NULL, Consumer, env);
 	co_resume(consumer_routine);
 
+	//创建生产者co
 	stCoRoutine_t* producer_routine;
 	co_create(&producer_routine, NULL, Producer, env);
 	co_resume(producer_routine);

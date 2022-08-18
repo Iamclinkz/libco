@@ -48,12 +48,14 @@ using namespace std;
 stCoRoutine_t *GetCurrCo( stCoRoutineEnv_t *env );
 struct stCoEpoll_t;
 
-//全局的本线程共享的记录co调用链的结构
+//全局的本线程共享的记录co调用链的结构,随着主协程一起被创建
 struct stCoRoutineEnv_t
 {
 	//保存调用链的栈，libco是一个非对称的co模型，每次调用者（return）调用被调用者（call）的
 	//时候，把被调用者压栈，然后iCallStackSize+1，然后从被调用者返回的时候再弹出并且将
-	//iCallStackSize-1.
+	//iCallStackSize-1.每个线程共有一个,记录本线程上运行的协程的执行顺序
+	//所以这个pCallStack结构即是保存协程控制块指针类型的数组,用于记录这个调用关系
+	//pCallStack[0]即指向主协程
 	stCoRoutine_t *pCallStack[ 128 ];
 	int iCallStackSize;
 

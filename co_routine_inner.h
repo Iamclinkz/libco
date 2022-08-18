@@ -45,20 +45,20 @@ struct stShareStack_t
 };
 
 
-//携程控制块结构
+//协程控制块结构
 struct stCoRoutine_t
 {
-	//指定了携程的环境，由于不支持携程在线程之间的迁移，所以属于是同一个线程的所有携程的执行环境，
+	//指定了协程的环境，由于不支持协程在线程之间的迁移，所以属于是同一个线程的所有协程的执行环境，
 	//即指向的是本co对应的thread的环境
 	stCoRoutineEnv_t *env;
-	//待执行携程数量
+	//实际待执行的协程函数
 	pfn_co_routine_t pfn;
-	//待执行携程参数
+	//待执行协程参数
 	void *arg;
-	//用于携程切换保留上下文
+	//用于协程切换保留上下文,即保存esp、ebp、eip 和其他通用寄存器的值。
 	coctx_t ctx;
 
-	//本携程的各种标志
+	//本协程的各种标志
 	char cStart;
 	char cEnd;
 	char cIsMain;

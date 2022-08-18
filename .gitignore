@@ -32,3 +32,8 @@ README.md
 *.exe
 *.out
 *.app
+
+output
+test
+build
+.cache
