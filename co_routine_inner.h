@@ -27,20 +27,27 @@ struct stCoSpec_t
 	void *value;
 };
 
+//子栈的控制块结构
 struct stStackMem_t
 {
-	stCoRoutine_t* occupy_co;
+	stCoRoutine_t* occupy_co;		//占有此共享栈的 co
 	int stack_size;
-	char* stack_bp; //stack_buffer + stack_size
-	char* stack_buffer;
+	char* stack_bp; //stack_buffer + stack_size 即共享栈栈顶
+	char* stack_buffer;		//共享栈栈底
 
 };
 
+
+//共享栈控制块指针,每个共享栈有count个子栈,子栈的控制块在stack_array数组中
 struct stShareStack_t
 {
+	//作为stack_array的第一维的索引,指向下一个应该被分配的子栈的控制块的下标
 	unsigned int alloc_idx;
+	//总的共享栈的大小
 	int stack_size;
+	//本共享栈被划分成多少个小的栈(即stack_array的第一维对多到几)
 	int count;
+	//存放子栈控制块结构体指针的数组
 	stStackMem_t** stack_array;
 };
 
@@ -61,14 +68,15 @@ struct stCoRoutine_t
 	//本协程的各种标志
 	char cStart;
 	char cEnd;
-	char cIsMain;
-	char cEnableSysHook;
-	char cIsShareStack;
+	char cIsMain;			//是否是首个 co
+	char cEnableSysHook;	//是否hook一手系统调用
+	char cIsShareStack;		//是否使用共享栈
 
 	//保存程序的环境变量的指针
 	void *pvEnv;
 
 	//char sRunStack[ 1024 * 128 ];
+	//这里指向了本 co 运行的时候实际指向的栈内存的地址
 	stStackMem_t* stack_mem;
 
 

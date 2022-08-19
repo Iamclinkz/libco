@@ -171,6 +171,7 @@ struct rpchook_connagent_head_t
 }__attribute__((packed));
 
 
+//使用这个宏运行时 hook 住名为 name 的系统调用,替换成同名的我们的系统调用
 #define HOOK_SYS_FUNC(name) if( !g_sys_##name##_func ) { g_sys_##name##_func = (name##_pfn_t)dlsym(RTLD_NEXT,#name); }
 
 static inline ll64_t diff_ms(struct timeval &begin,struct timeval &end)
@@ -820,7 +821,7 @@ int setenv(const char *n, const char *value, int overwrite)
 			if( !self->pvEnv )
 			{
 				self->pvEnv = dup_co_sysenv_arr( &g_co_sysenv );
-			}
+			}`
 			stCoSysEnvArr_t *arr = (stCoSysEnvArr_t*)(self->pvEnv);
 
 			stCoSysEnv_t name = { (char*)n,0 };

@@ -33,6 +33,7 @@
 struct co_epoll_res
 {
 	int size;
+	//存放系统调用 epoll_wait() 的第二个参数
 	struct epoll_event *events;
 	struct kevent *eventlist;
 };

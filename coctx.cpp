@@ -107,6 +107,7 @@ int coctx_make(coctx_t* ctx, coctx_pfn_t pfn, const void* s, const void* s1) {
   return 0;
 }
 #elif defined(__x86_64__)
+//进行 ctx 的初始化
 int coctx_make(coctx_t* ctx, coctx_pfn_t pfn, const void* s, const void* s1) {
   char* sp = ctx->ss_sp + ctx->ss_size - sizeof(void*);
   sp = (char*)((unsigned long)sp & -16LL);
@@ -124,6 +125,7 @@ int coctx_make(coctx_t* ctx, coctx_pfn_t pfn, const void* s, const void* s1) {
   return 0;
 }
 
+//初始化 co 的 ctx
 int coctx_init(coctx_t* ctx) {
   memset(ctx, 0, sizeof(*ctx));
   return 0;

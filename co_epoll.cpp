@@ -37,6 +37,7 @@ int	co_epoll_create( int size )
 	return epoll_create( size );
 }
 
+//初始化 epoll_res 结构
 struct co_epoll_res *co_epoll_res_alloc( int n )
 {
 	struct co_epoll_res * ptr = 

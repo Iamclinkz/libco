@@ -28,6 +28,7 @@
 struct stCoRoutine_t;
 struct stShareStack_t;
 
+//co 的上下文的设置结构,设置co 的栈的大小,co 应该使用共享栈还是独立栈等
 struct stCoRoutineAttr_t
 {
 	int stack_size;
