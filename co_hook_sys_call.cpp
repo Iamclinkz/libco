@@ -821,7 +821,7 @@ int setenv(const char *n, const char *value, int overwrite)
 			if( !self->pvEnv )
 			{
 				self->pvEnv = dup_co_sysenv_arr( &g_co_sysenv );
-			}`
+			}
 			stCoSysEnvArr_t *arr = (stCoSysEnvArr_t*)(self->pvEnv);
 
 			stCoSysEnv_t name = { (char*)n,0 };

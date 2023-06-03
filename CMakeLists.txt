@@ -17,6 +17,7 @@ enable_language(C ASM)
 set(SOURCE_FILES
         co_epoll.cpp
         co_hook_sys_call.cpp
+        co_comm.cpp
         co_routine.cpp
         coctx.cpp
         coctx_swap.S)
