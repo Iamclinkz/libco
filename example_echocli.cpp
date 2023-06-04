@@ -67,6 +67,7 @@ static int iSuccCnt = 0;
 static int iFailCnt = 0;
 static int iTime = 0;
 
+//统计成功和失败计数
 void AddSuccCnt()
 {
 	int now = time(NULL);
@@ -112,6 +113,7 @@ static void *readwrite_routine( void *arg )
 	{
 		if ( fd < 0 )
 		{
+			//创建一个fd，用于跟服务器连接
 			fd = socket(PF_INET, SOCK_STREAM, 0);
 			struct sockaddr_in addr;
 			SetAddr(endpoint->ip, endpoint->port, addr);
@@ -187,32 +189,36 @@ int main(int argc,char *argv[])
 	int cnt = atoi( argv[3] );
 	int proccnt = atoi( argv[4] );
 	
+	//屏蔽SIGPIPE信号，防止进程因为写入已关闭的管道或socket连接而异常终止。
 	struct sigaction sa;
 	sa.sa_handler = SIG_IGN;
 	sigaction( SIGPIPE, &sa, NULL );
 	
-	for(int k=0;k<proccnt;k++)
-	{
+	// for(int k=0;k<proccnt;k++)
+	// {
 
-		pid_t pid = fork();
-		if( pid > 0 )
-		{
-			continue;
-		}
-		else if( pid < 0 )
-		{
-			break;
-		}
+	// 	pid_t pid = fork();
+	// 	if( pid > 0 )
+	// 	{
+	// 		continue;
+	// 	}
+		// else if( pid < 0 )
+		// {
+		// 	break;
+		// }
 		for(int i=0;i<cnt;i++)
 		{
+			//创建proccnt个进程，每个进程创建cnt个用于连接服务器的co
 			stCoRoutine_t *co = 0;
 			co_create( &co,NULL,readwrite_routine, &endpoint);
 			co_resume( co );
 		}
+
+		//主进程执行eventLoop
 		co_eventloop( co_get_epoll_ct(),0,0 );
 
 		exit(0);
-	}
+	//}
 	return 0;
 }
 /*./example_echosvr 127.0.0.1 10000 100 50*/

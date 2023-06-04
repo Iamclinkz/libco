@@ -183,7 +183,7 @@ static inline ll64_t diff_ms(struct timeval &begin,struct timeval &end)
 }
 
 
-
+//通过fd号，获取内部对应的rpchook_t结构（具体方式是按下标直接索引）
 static inline rpchook_t * get_by_fd( int fd )
 {
 	if( fd > -1 && fd < (int)sizeof(g_rpchook_socket_fd) / (int)sizeof(g_rpchook_socket_fd[0]) )
@@ -242,6 +242,7 @@ int socket(int domain, int type, int protocol)
 
 int co_accept( int fd, struct sockaddr *addr, socklen_t *len )
 {
+	//这就是调用的原生的accept
 	int cli = accept( fd,addr,len );
 	if( cli < 0 )
 	{
@@ -285,10 +286,13 @@ int connect(int fd, const struct sockaddr *address, socklen_t address_len)
 
 	for(int i=0;i<3;i++) //25s * 3 = 75s
 	{
+		//每次等待25s，一共等待3次是因为
+		//内核中对三次握手的超时限制是75秒，超时则会失败。
 		memset( &pf,0,sizeof(pf) );
 		pf.fd = fd;
 		pf.events = ( POLLOUT | POLLERR | POLLHUP );
 
+		//等待连接事件，让出cpu。注意connect触发的是可写事件
 		pollret = poll( &pf,1,25000 );
 
 		if( 1 == pollret  )
@@ -299,21 +303,22 @@ int connect(int fd, const struct sockaddr *address, socklen_t address_len)
 
 	if( pf.revents & POLLOUT ) //connect succ
 	{
-    // 3.check getsockopt ret
-    int err = 0;
-    socklen_t errlen = sizeof(err);
-    ret = getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &errlen);
-    if (ret < 0) {
-      return ret;
-    } else if (err != 0) {
-      errno = err;
-      return -1;
-    }
-    errno = 0;
-    return 0;
-  }
+		//如果是可写，说明是连接成功，检查是否有错误
+		// 3.check getsockopt ret
+		int err = 0;
+		socklen_t errlen = sizeof(err);
+		ret = getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &errlen);
+		if (ret < 0) {
+			return ret;
+		} else if (err != 0) {
+			errno = err;
+			return -1;
+		}
+		errno = 0;
+		return 0;
+  	}
 
-  errno = ETIMEDOUT;
+  	errno = ETIMEDOUT;
 	return ret;
 }
 
